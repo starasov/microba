@@ -4,13 +4,16 @@ import org.microba.core.binding.Binder;
 import org.microba.core.binding.Binding;
 import org.microba.core.binding.BindingContext;
 import org.microba.core.injection.DefaultInjectionContext;
-import org.microba.core.injection.InjectionContext;
+import org.microba.core.injection.InjectionContextControl;
 import org.microba.core.injection.Key;
-import org.microba.core.provider.ProviderMapper;
+import org.microba.core.lifecycle.DefaultLifecycleContext;
+import org.microba.core.mapper.BindingMapper;
+import org.microba.core.mapper.DefaultBindingMapper;
+import org.microba.core.mapper.LifecycleBindingMapper;
+import org.microba.core.mapper.ScopeBindingMapper;
 import org.microba.core.scope.DefaultScopeContext;
 
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
 /**
  * @author starasov
@@ -21,23 +24,33 @@ public class Microba {
         return new Binder(new BindingContext());
     }
 
-    public static InjectionContext createContext(Binder binder) {
-        BindingContext bindingContext = binder.getBindingContext();
+    public static MicrobaContext createContext(Binder binder) {
+        MicrobaContext microbaContext = createDefaultContext();
+        BindingMapper bindingMapper = createMapper(microbaContext);
+        InjectionContextControl injectionContextControl = (InjectionContextControl) microbaContext.getInjectionContext();
 
-        DefaultInjectionContext injectionContext = new DefaultInjectionContext();
-        DefaultScopeContext scopeContext = new DefaultScopeContext();
-        
-        ProviderMapper providerMapper = new ProviderMapper(injectionContext, scopeContext);
-        for (Binding<?> binding : bindingContext.getBindings()) {
-            Provider<?> provider = providerMapper.map(binding);
+        for (Binding<?> binding : binder.getBindingContext().getBindings()) {
+            Provider<?> provider = bindingMapper.map(binding);
             Key<?> key = Key.forClassAndQualifier(binding.getBindee(), binding.getQualifier());
 
             //noinspection unchecked
-            injectionContext.addProvider(key, (Provider) provider);
+            injectionContextControl.addProvider(key, (Provider) provider);
         }
 
-        scopeContext.activate(Singleton.class);
+        return microbaContext;
+    }
 
-        return injectionContext;
+    static MicrobaContext createDefaultContext() {
+        DefaultInjectionContext injectionContext = new DefaultInjectionContext();
+        DefaultScopeContext scopeContext = new DefaultScopeContext();
+        DefaultLifecycleContext lifecycleContext = new DefaultLifecycleContext();
+
+        return new MicrobaContext(injectionContext, scopeContext, lifecycleContext);
+    }
+
+    static BindingMapper createMapper(MicrobaContext microbaContext) {
+        DefaultBindingMapper defaultBindingMapper = new DefaultBindingMapper(microbaContext.getInjectionContext());
+        LifecycleBindingMapper lifecycleBindingMapper = new LifecycleBindingMapper(defaultBindingMapper, microbaContext.getLifecycleContext());
+        return new ScopeBindingMapper(lifecycleBindingMapper, microbaContext.getScopeContext());
     }
 }

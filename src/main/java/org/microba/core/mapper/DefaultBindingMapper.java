@@ -1,21 +1,21 @@
-package org.microba.core.provider;
+package org.microba.core.mapper;
 
 import org.microba.core.binding.Binding;
 import org.microba.core.injection.InjectionContext;
-import org.microba.core.scope.ScopeContext;
+import org.microba.core.provider.ClassProvider;
+import org.microba.core.provider.InstanceProvider;
+import org.microba.core.provider.ProviderProvider;
 
 import javax.inject.Provider;
 
 /**
  * @author starasov
  */
-public class ProviderMapper {
+public class DefaultBindingMapper implements BindingMapper {
     private final InjectionContext injectionContext;
-    private final ScopeContext scopeContext;
 
-    public ProviderMapper(InjectionContext injectionContext, ScopeContext scopeContext) {
+    public DefaultBindingMapper(InjectionContext injectionContext) {
         this.injectionContext = injectionContext;
-        this.scopeContext = scopeContext;
     }
 
     public <T> Provider<T> map(Binding<T> configuration) {
@@ -32,12 +32,6 @@ public class ProviderMapper {
             provider = ClassProvider.forClass(injectionContext, configuration.getTarget());
         } else {
             provider = ClassProvider.forClass(injectionContext, configuration.getBindee());
-        }
-
-        if (configuration.getScope() != null) {
-            ScopedProvider<T> scopedProvider = new ScopedProvider<T>(provider);
-            scopeContext.addListener(configuration.getScope(), scopedProvider);
-            provider = scopedProvider;
         }
 
         return provider;
