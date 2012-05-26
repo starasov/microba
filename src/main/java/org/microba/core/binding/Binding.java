@@ -29,6 +29,10 @@ public class Binding<T> {
         return target;
     }
 
+    public boolean hasTarget() {
+        return target != null;
+    }
+
     public void setTarget(Class<? extends T> target) {
         this.target = target;
     }
@@ -37,12 +41,20 @@ public class Binding<T> {
         return targetProvider;
     }
 
+    public boolean hasProvider() {
+        return targetProvider != null;
+    }
+
     public void setTargetProvider(Class<Provider<T>> targetProvider) {
         this.targetProvider = targetProvider;
     }
 
     public T getInstance() {
         return instance;
+    }
+
+    public boolean hasInstance() {
+        return instance != null;
     }
 
     public void setInstance(T instance) {

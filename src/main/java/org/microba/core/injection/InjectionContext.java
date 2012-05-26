@@ -11,4 +11,6 @@ public interface InjectionContext {
 
     <T> Provider<T> getProvider(Class<T> key);
     <T> Provider<T> getProvider(Key<T> key);
+
+    <T> boolean hasProviderFor(Class<T> key);
 }

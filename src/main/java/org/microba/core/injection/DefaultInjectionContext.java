@@ -52,6 +52,11 @@ public class DefaultInjectionContext implements InjectionContext, InjectionConte
     }
 
     @Override
+    public <T> boolean hasProviderFor(Class<T> key) {
+        return providers.containsKey(Key.forClass(key));
+    }
+
+    @Override
     public <T> void addProvider(Key<T> to, Provider<T> provider) {
         providers.put(to, provider);
     }
