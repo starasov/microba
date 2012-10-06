@@ -57,6 +57,12 @@ public class DefaultInjectionContext implements InjectionContext, InjectionConte
     }
 
     @Override
+    public void injectMembers(Object target) {
+        FieldInjector injector = new FieldInjector(this);
+        injector.injectMembers(target);
+    }
+
+    @Override
     public <T> void addProvider(Key<T> to, Provider<T> provider) {
         providers.put(to, provider);
     }

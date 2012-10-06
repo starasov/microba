@@ -51,8 +51,4 @@ public class Microba {
         LifecycleBindingMapper lifecycleBindingMapper = new LifecycleBindingMapper(defaultBindingMapper, microbaContext.getLifecycleContext());
         return new ScopeBindingMapper(lifecycleBindingMapper, microbaContext.getScopeContext());
     }
-
-    public static FieldInjector createFieldInjector(InjectionContext context) {
-        return new DefaultFieldInjector(context);
-    }    
 }

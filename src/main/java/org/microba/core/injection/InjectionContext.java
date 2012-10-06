@@ -13,4 +13,6 @@ public interface InjectionContext {
     <T> Provider<T> getProvider(Key<T> key);
 
     <T> boolean hasProviderFor(Class<T> key);
+
+    void injectMembers(Object target);
 }
