@@ -2,6 +2,8 @@ package org.microba.core.injection;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Qualifier;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +16,10 @@ import java.util.List;
 class FieldInjector {
 
     private static final String UNKNOWN_FIELD_CLASS =
-            "Cannot find provider for field %s of type %s";
+            "Cannot find provider for field [%s] of type [%s] in class [%s]";
 
     private static final String UNASSIGNABLE_FIELD_TEXT =
-            "Field %s cannot be assigned";
+            "Field [%s] cannot be assigned";
 
     private final InjectionContext context;
 
@@ -30,10 +32,13 @@ class FieldInjector {
 
         for (Field field: injectableFields) {
             boolean accessible = field.isAccessible();
+            Annotation qualifier = getFieldQualifier(field);
             if (!accessible) {
                 field.setAccessible(true);
             }
-            Provider<?> provider = context.getProvider(field.getType());
+            Key key = qualifier == null ? Key.forClass(field.getType()) :
+                    Key.forClassAndQualifier(field.getType(), qualifier.annotationType());
+            Provider<?> provider = context.getProvider(key);
             if (provider == null) {
                 throw createUnknownFieldClassException(field);
             }
@@ -48,13 +53,22 @@ class FieldInjector {
         }
     }
 
+    private Annotation getFieldQualifier(Field field) {
+        for (Annotation annotation: field.getDeclaredAnnotations()) {
+            if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
+                return annotation;
+            }
+        }
+        return null;
+    }
+
     private RuntimeException createUnassignableFieldException(Field field, IllegalAccessException e) {
-        return new IllegalArgumentException(String.format(UNASSIGNABLE_FIELD_TEXT, field.getName(),
-                field.getType().toString()), e);
+        return new IllegalArgumentException(String.format(UNASSIGNABLE_FIELD_TEXT, field.getName()), e);
     }
 
     private RuntimeException createUnknownFieldClassException(Field field) {
-        return new IllegalArgumentException(String.format(UNKNOWN_FIELD_CLASS, field.getName()));
+        return new IllegalArgumentException(String.format(UNKNOWN_FIELD_CLASS,
+                field.getName(), field.getType().toString(), field.getDeclaringClass().getCanonicalName()));
     }
 
     private List<Field> findInjectableFields(Object target) {
