@@ -1,7 +1,7 @@
 package org.microba.core.binding;
 
 import javax.inject.Provider;
-import javax.inject.Qualifier;
+import java.lang.annotation.Annotation;
 
 /**
 * @author starasov
@@ -17,7 +17,7 @@ public class TargetBinder<T> extends ScopeBinder<T> {
         return new ScopeBinder<T>(getBinding());
     }
 
-    public TargetBinder<T> qualifiedWith(Class<? extends Qualifier> qualifier) {
+    public TargetBinder<T> qualifiedWith(Class<? extends Annotation> qualifier) {
         getBinding().setQualifier(qualifier);
         return this;
     }

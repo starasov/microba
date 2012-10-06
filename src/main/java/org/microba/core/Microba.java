@@ -3,9 +3,7 @@ package org.microba.core;
 import org.microba.core.binding.Binder;
 import org.microba.core.binding.Binding;
 import org.microba.core.binding.BindingContext;
-import org.microba.core.injection.DefaultInjectionContext;
-import org.microba.core.injection.InjectionContext;
-import org.microba.core.injection.Key;
+import org.microba.core.injection.*;
 import org.microba.core.provider.ProviderMapper;
 import org.microba.core.scope.DefaultScopeContext;
 
@@ -39,5 +37,9 @@ public class Microba {
         scopeContext.activate(Singleton.class);
 
         return injectionContext;
+    }
+
+    public static FieldInjector createFieldInjector(InjectionContext context) {
+        return new DefaultFieldInjector(context);
     }
 }
