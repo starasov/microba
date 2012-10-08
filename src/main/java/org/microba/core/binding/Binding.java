@@ -10,7 +10,7 @@ public class Binding<T> {
     private Class<T> bindee;
 
     private Class<? extends T> target;
-    private Class<Provider<T>> targetProvider;
+    private Class<? extends Provider<T>> targetProvider;
 
     private T instance;
 
@@ -37,7 +37,7 @@ public class Binding<T> {
         this.target = target;
     }
 
-    public Class<Provider<T>> getProvider() {
+    public Class<? extends Provider<T>> getProvider() {
         return targetProvider;
     }
 
@@ -45,7 +45,7 @@ public class Binding<T> {
         return targetProvider != null;
     }
 
-    public void setTargetProvider(Class<Provider<T>> targetProvider) {
+    public void setTargetProvider(Class<? extends Provider<T>> targetProvider) {
         this.targetProvider = targetProvider;
     }
 

@@ -22,7 +22,7 @@ public class TargetBinder<T> extends ScopeBinder<T> {
         return this;
     }
 
-    public ScopeBinder toProvider(Class<Provider<T>> provider) {
+    public ScopeBinder toProvider(Class<? extends Provider<T>> provider) {
         getBinding().setTargetProvider(provider);
         return new ScopeBinder<T>(getBinding());
     }
